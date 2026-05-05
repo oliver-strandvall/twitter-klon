@@ -17,16 +17,7 @@ export async function GET(
 
         const db = getDb();
 
-        const sessionRow = db.prepare("SELECT * FROM sessions WHERE sessionId = ?").get(sessionId);
-
-        if(!sessionRow) {
-            return NextResponse.json(
-                { error: "Invalid user" },
-                { status: 401 }
-            );
-        }
-
-        const session = db.prepare("SELECT id, username, name FROM users WHERE id = ?").get(sessionRow.userId);
+        const session = db.prepare("SELECT * FROM sessions WHERE sessionId = ?").get(sessionId);
 
         if(!session) {
             return NextResponse.json(
@@ -43,26 +34,52 @@ export async function GET(
                 { status: 404 }
             );
         }
-
+        
         const likesCounts = db.prepare("SELECT postId, COUNT(*) as count FROM likes GROUP BY postId").all();
-        const likedByUser = db.prepare("SELECT postId FROM likes WHERE userId = ?").all(session.id);
+        const commentsCounts = db.prepare("SELECT postId, COUNT(*) as count FROM comments GROUP BY postId").all();
+        const likedByUser = db.prepare("SELECT postId FROM likes WHERE userId = ?").all(session.userId);
+
         const likesMap: Record<number, number> = {};
+        const commentsMap: Record<number, number> = {};
+        const likedByUserMap: Record<number, boolean> = {};
 
         for (const like of likesCounts) {
             likesMap[like.postId] = like.count;
         }
 
-        const posts = db.prepare("SELECT * FROM posts WHERE userName = ? ORDER BY createdAt DESC").all(username);
+        for (const comment of commentsCounts) {
+            commentsMap[comment.postId] = comment.count;
+        }
+
+        for (const post of likedByUser) {
+            likedByUserMap[post.postId] = true;
+        }
+
+        const posts = db.prepare("SELECT * FROM posts WHERE userId = ? ORDER BY createdAt DESC").all(user.id);
 
         for (const post of posts) {
             post.likeCount = likesMap[post.id] || 0;
-            post.likedByUser = likedByUser.some((like: { postId: number }) => like.postId === post.id);
+            post.commentCount = commentsMap[post.id] || 0;
+            post.likedByUser = likedByUserMap[post.id] == true;
+
+            post.comments = db
+                .prepare("SELECT * FROM comments WHERE postId = ? ORDER BY createdAt ASC")
+                .all(post.id);
         }
 
+        const currentUser = db.prepare("SELECT username FROM users WHERE id = ?").get(session.userId);
+
+        const followerCount = db.prepare("SELECT COUNT(*) as count FROM followers WHERE followingId = ?").get(user.username);
+        const followedByUser = db.prepare("SELECT * FROM followers WHERE followerId = ? AND followingId = ?").get(currentUser.username, username);
+
+        user.followerCount = followerCount?.count || 0;
+        user.followedByUser = followedByUser != null;
+
         return NextResponse.json(
-            { posts, user, session },
+            { posts, user, session: { username: currentUser.username } },
             { status: 200 }
         );
+
     } catch (err: unknown) {
         console.error(err);
 

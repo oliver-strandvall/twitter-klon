@@ -1,8 +1,10 @@
 "use client"
 
 import { AiOutlineLike, AiFillLike } from "react-icons/ai"
+import { AiOutlineMessage, AiFillMessage } from "react-icons/ai";
 import { use, useEffect, useState } from "react"
 import { useRouter } from "next/navigation";
+import CommentForm from "./commentForm";
 
 type PageProps = {
   session: { username: string; name: string; id: number };
@@ -11,8 +13,10 @@ type PageProps = {
 export default function Main({ session }: PageProps) {
   const router = useRouter();
   const [message, setMessage] = useState("");
-  const [data, setData] = useState<{ id: number; content: string; userId: number; createdAt: number; userName: string, name: string, likeCount: number, likedByUser: boolean }[] | []>([]);
+  const [data, setData] = useState<{ id: number; content: string; userId: number; createdAt: number; userName: string, name: string, likeCount: number, likedByUser: boolean, commentCount: number,
+  comments: { id: number; content: string; userId: number; createdAt: number; username: string }[] }[] | []>([]);
   const [update, setUpdate] = useState(false);
+  const [showComments, setshowComments] = useState<{ [key: number]: boolean }>({});
 
   async function handleLogout() {
     await fetch("/api/logout", {
@@ -40,6 +44,26 @@ export default function Main({ session }: PageProps) {
     }
   }
 
+  async function handleCommentSubmit(content: string, id: number) {
+    const res = await fetch(`/api/posts/${id}/comment`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content }),
+    });
+    if (res.ok) {
+      setUpdate(prev => !prev);
+    }
+  }
+
+  async function handleDeleteComment(id: number) {
+    const res = await fetch(`/api/posts/${id}/comment`, {
+      method: "DELETE",
+    });
+    if (res.ok) {
+      setUpdate(prev => !prev);
+    }
+  }
+
   async function handleDelete(id: number) {
     const res = await fetch(`/api/posts?id=${id}`, {
       method: "DELETE",
@@ -53,20 +77,19 @@ export default function Main({ session }: PageProps) {
     router.push(`/users/${session.username}`);
   }
 
-  async function getUser() {
-    const res = await fetch("/api/users/[username]", {
-      method: "GET",
-    });
-    if (res.ok) {
-      const json = await res.json();
-    }
-  }
-
   async function getData() {
     const res = await fetch("/api/posts");
     if (res.ok) {
       const json = await res.json();
       setData(json.posts);
+    }
+  }
+
+  async function getComments(id: number) {
+    const res = await fetch(`/api/posts/${id}/comments`);
+    if (res.ok) {
+      const json = await res.json();
+      return json.comments;
     }
   }
 
@@ -87,7 +110,6 @@ export default function Main({ session }: PageProps) {
       setUpdate(prev => !prev);
     }
   }
-
 
   useEffect(() => {
       getData();
@@ -118,13 +140,14 @@ export default function Main({ session }: PageProps) {
   }
 
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center bg-gray-800 text-white p-5">
+    <div className="flex flex-col min-h-screen items-center bg-gray-800 text-white p-5">
         <div className="bg-gray-950 p-5 rounded-lg w-full">
           <h1>All Posts:</h1>
         </div>
         <div className="w-full m-5 flex flex-col gap-5 rounded-lg">
         {data.map((post) => (
-          <div key={post.id} className="bg-gray-900 p-5 rounded-lg flex justify-between items-center">
+          <div key={post.id} className="bg-gray-900 p-5 rounded-lg">
+          <div className="flex justify-between items-center">
             <div className="flex flex-col flex-wrap gap-2">
               <div>
                 <p><a href={`/users/${post.userName}`} className="underline">{post.userName}</a></p>
@@ -141,6 +164,13 @@ export default function Main({ session }: PageProps) {
                   <button onClick={() => unlikePost(post.id)} className="bg-gray-900 hover:bg-gray-800 active:bg-gray-700 text-white p-2 rounded-lg w-10 h-10"><AiFillLike size={25} /></button>
                 )}
                 <p className="mt-1.5">{post.likeCount}</p>
+                {showComments[post.id] && (
+                  <button onClick={() => setshowComments(prev => ({ ...prev, [post.id]: false }))} className="bg-gray-900 hover:bg-gray-800 active:bg-gray-700 text-white p-2 rounded-lg w-10 h-10 ml-2"><AiFillMessage size={25} /></button>
+                )}
+                {!showComments[post.id] && (
+                  <button onClick={() => setshowComments(prev => ({ ...prev, [post.id]: true }))} className="bg-gray-900 hover:bg-gray-800 active:bg-gray-700 text-white p-2 rounded-lg w-10 h-10 ml-2"><AiOutlineMessage size={25} /></button>
+                )}
+                <p className="mt-1.5">{post.commentCount}</p>
               </div>
             </div>
             <div className="flex justify-between gap-5 items-center">
@@ -149,14 +179,34 @@ export default function Main({ session }: PageProps) {
                 <button onClick={() => handleDelete(post.id)} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-2 rounded-lg w-20 h-12">Delete</button>
               )}
             </div>
+            </div>
+            {showComments[post.id] && (
+            <>
+            <CommentForm postId={post.id} onCommentSubmit={handleCommentSubmit} />
+            {post.comments?.map((comment) => (
+              <div key={comment.id} className="bg-gray-950 p-5 rounded-lg mt-5 flex justify-between items-center">
+                <div className="flex justify-between gap-5 items-center">
+                  <p><a href={`/users/${comment.username}`} className="underline">{comment.username}</a></p>
+                  <p>{comment.content}</p>
+                </div>
+                <div className="flex justify-between gap-5 items-center">
+                <p>{timeAgo(comment.createdAt)}</p>
+                  {session.id === comment.userId && (
+                    <button onClick={() => handleDeleteComment(comment.id)} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-2 rounded-lg w-20 h-12">Delete</button>
+                  )}
+                </div>
+              </div>
+            ))}
+            </>
+            )}
           </div>
         ))}
       </div>
       <div className="bg-gray-950 w-full m-5 p-5 flex flex-col gap-5 rounded-lg">
         <h1>Create Post:</h1>
-        <form onSubmit={handleSubmit} className="w-full flex flex-col gap-5">
-          <input value={message} onChange={(e) => setMessage(e.target.value)} name="post" type="text" placeholder="What's on your mind..." className="bg-gray-900 max-w-150 p-5 rounded-lg h-15"></input>
-          <button className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-3 rounded-lg w-35 h-15">Post</button>
+        <form onSubmit={handleSubmit} className="w-full flex justify-between items-center">
+          <input value={message} onChange={(e) => setMessage(e.target.value)} name="post" type="text" placeholder="What's on your mind..." className="bg-gray-900 w-1/2 p-5 rounded-lg h-15"></input>
+          <button type="submit" className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-3 rounded-lg w-35 h-15">Post</button>
         </form>
       </div>
       <div className="items-center flex justify-between bg-gray-950 w-full m-5 p-5 rounded-lg">

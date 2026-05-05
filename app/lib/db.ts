@@ -49,5 +49,25 @@ export function getDb() {
     )
   `);
 
+    db.exec(`
+    CREATE TABLE IF NOT EXISTS comments (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      content TEXT,
+      userId INTEGER,
+      postId INTEGER,
+      createdAt INTEGER,
+      username TEXT
+    )
+  `);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS followers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      followerId INTEGER,
+      followingId INTEGER,
+      createdAt INTEGER
+    )
+  `);
+
   return db;
 }

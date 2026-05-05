@@ -2,10 +2,13 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/app/lib/db";
 import { cookies } from 'next/headers'
 
-export async function POST(request: Request) {
+export async function POST(request: Request, 
+  { params }: RouteContext<'/api/posts/[id]/comment'>
+  ) {
   try {
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get("session");
+    const { id } = await params;
 
     if (!sessionCookie) {
       return NextResponse.json(
@@ -20,13 +23,6 @@ export async function POST(request: Request) {
     const { content } = body;
     const createdAt = new Date().getTime()
 
-    if (!content) {
-      return NextResponse.json(
-        { error: "Content is required" },
-        { status: 400 }
-      );
-    }
-
     const db = getDb();
     const session = db.prepare("SELECT * FROM sessions WHERE sessionId = ?").get(sessionId);
 
@@ -35,6 +31,15 @@ export async function POST(request: Request) {
         { error: "Invalid user" },
         { status: 401 }
       );
+    }
+
+    const post = db.prepare("SELECT * FROM posts WHERE id = ?").get(id);
+
+    if (!post) {
+        return NextResponse.json(
+            { error: "Post not found" },
+            { status: 404 }
+        );
     }
 
     const user = db.prepare("SELECT * FROM users WHERE id = ?").get(session.userId);
@@ -46,20 +51,14 @@ export async function POST(request: Request) {
     }
 
     const userId = session.userId;
-    const userName = user.username;
-    const name = user.name;
-
-    const result = db
-      .prepare(
-        "INSERT INTO posts (content, userId, createdAt, userName, name) VALUES (?, ?, ?, ?, ?)"
-      )
-      .run(content, userId, createdAt, userName, name);
-
+    
+    db.prepare("INSERT INTO comments (content, userId, postId, createdAt, username) VALUES (?, ?, ?, ?, ?)").run(content, userId, id, createdAt, user.username);
     return NextResponse.json(
-      { id: result.lastInsertRowid, content },
-      { status: 201 }
+        { message: "Comment added" },
+        { status: 200 }
     );
-  } catch (err: unknown) {
+
+    } catch (err: unknown) {
     console.error(err);
 
     return NextResponse.json(
@@ -84,7 +83,7 @@ export async function GET(request: Request) {
   const sessionId = sessionCookie.value;
 
   const db = getDb();
-  const session = db.prepare("SELECT * FROM sessions WHERE sessionId = ?").get(sessionId);
+  const session = await db.prepare("SELECT * FROM sessions WHERE sessionId = ?").get(sessionId);
 
   if(!session) {
     return NextResponse.json(
@@ -93,39 +92,10 @@ export async function GET(request: Request) {
     );
   }
 
-  const likesCounts = db.prepare("SELECT postId, COUNT(*) as count FROM likes GROUP BY postId").all();
-  const commentsCounts = db.prepare("SELECT postId, COUNT(*) as count FROM comments GROUP BY postId").all();
-  const likedByUser = db.prepare("SELECT postId FROM likes WHERE userId = ?").all(session.userId);
-  const likesMap: Record<number, number> = {};
-  const commentsMap: Record<number, number> = {};
-  const likedByUserMap: Record<number, boolean> = {};
-
-  for (const like of likesCounts) {
-    likesMap[like.postId] = like.count;
-  }
-
-  for (const comment of commentsCounts) {
-    commentsMap[comment.postId] = comment.count;
-  }
-
-  for (const post of likedByUser) {
-    likedByUserMap[post.postId] = true;
-  }
-
-  const posts = db.prepare("SELECT * FROM posts ORDER BY createdAt DESC").all();
-
-  for (const post of posts) {
-    post.likeCount = likesMap[post.id] || 0;
-    post.commentCount = commentsMap[post.id] || 0;
-    post.likedByUser = likedByUserMap[post.id] == true;
-
-    post.comments = db
-      .prepare("SELECT * FROM comments WHERE postId = ? ORDER BY createdAt ASC")
-      .all(post.id);
-  }
+  const comments = db.prepare("SELECT * FROM comments ORDER BY createdAt ASC").all();
 
   return NextResponse.json(
-    { posts },
+    { comments },
     { status: 200 }
   );
   } catch (err: unknown) {
@@ -138,10 +108,13 @@ export async function GET(request: Request) {
   }
 }
 
-export async function DELETE(request: Request) {
+export async function DELETE(request: Request, 
+  { params }: RouteContext<'/api/posts/[id]/comment'>
+  ) {
   try {
     const cookieStore = await cookies()
     const sessionCookie = cookieStore.get("session");
+    const { id } = await params;
 
     if (!sessionCookie) {
       return NextResponse.json(
@@ -160,23 +133,23 @@ export async function DELETE(request: Request) {
         { error: "Invalid user" },
         { status: 401 }
       );
-    } 
-  
-    const { searchParams } = new URL(request.url);
-    const id = Number(searchParams.get("id"));
-    const result = db.prepare("DELETE FROM posts WHERE id = ? AND userId = ?").run(id, session.userId);
+    }
+
+    const result = db.prepare("DELETE FROM comments WHERE id = ? AND userId = ?").run(id, session.userId);
+
     if(result.changes === 0) {
       return NextResponse.json(
-        { error: "Post not found or you don't have permission to delete this post" },
+        { error: "Comment not found or you don't have permission to delete this comment" },
         { status: 401 }
       );
     }
+
     return NextResponse.json(
-      { message: "Post deleted with ID: " + id },
+      { message: "Comment deleted with ID: " + id },
       { status: 200 }
     );
 
-    } catch (err: unknown) {
+  } catch (err: unknown) {
     console.error(err);
 
     return NextResponse.json(
