@@ -128,6 +128,7 @@ export async function GET(request: Request) {
     { posts },
     { status: 200 }
   );
+  
   } catch (err: unknown) {
     console.error(err);
 

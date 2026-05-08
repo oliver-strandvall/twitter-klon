@@ -3,7 +3,7 @@
 import { AiOutlineLike, AiFillLike } from "react-icons/ai"
 import { AiOutlineMessage, AiFillMessage } from "react-icons/ai";
 import { use, useEffect, useState } from "react";
-import CommentForm from "@/app/components/commentForm";
+import CommentForm from "../../components/commentForm";
 
 type PageProps = {
   params: Promise<{ username: string }>;
@@ -12,7 +12,7 @@ type PageProps = {
 export default function UserPage({ params }: PageProps) {
   const [data, setData] = useState<{ id: number; content: string; userId: number; createdAt: number; userName: string, name: string, likeCount: number, likedByUser: boolean, commentCount: number,
   comments: { id: number; content: string; userId: number; createdAt: number; username: string }[] }[] | []>([]);
-  const [user, setUser] = useState<{ id: number; username: string; name: string; followedByUser: boolean; followerCount: number } | null>(null);
+  const [user, setUser] = useState<{ id: number; username: string; name: string; followedByUser: boolean; followerCount: number, followingCount: number } | null>(null);
   const [session, setSession] = useState<{ username: string; name: string; id: number } | null>(null);
   const [update, setUpdate] = useState(false);
   const [showComments, setshowComments] = useState<{ [key: number]: boolean }>({});
@@ -126,7 +126,7 @@ export default function UserPage({ params }: PageProps) {
         <div className="flex flex-col gap-2 w-full">
           <div className="flex flex-row justify-between w-full">
             <h1>{username}</h1>
-            <p className="text-gray-500 text-sm">@{user?.name || username}</p>
+            <p className="text-gray-500 text-sm">@{user?.name }</p>
           </div>
           <div className="flex flex-row gap-5 items-center bg-gray-900 p-5 rounded-lg">
           {username !== session?.username ? (
@@ -136,9 +136,10 @@ export default function UserPage({ params }: PageProps) {
             <button onClick={handleUnfollow} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-3 rounded-lg w-25">Unfollow</button>
           )
           ) : (
-            <p>You Cant Follow Yourself</p>
+            <></>
           )}
-          <h1>Followers: {user?.followerCount}</h1>
+          <h1><a href={`/users/${username}/followers`} className="underline">Followers: {user?.followerCount}</a></h1>
+          <h1><a href={`/users/${username}/following`} className="underline">Following: {user?.followingCount}</a></h1>
           </div>
         </div>
       </div>

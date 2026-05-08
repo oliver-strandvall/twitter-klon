@@ -41,8 +41,8 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-4 justify-center items-center">
               <h1 className="text-white text-2xl">Login</h1>
-              <input name="username" type="text" placeholder="Username" className="border border-white p-2 rounded-lg w-full" />
-              <input name="password" type="password" placeholder="Password" className="border border-white p-2 rounded-lg w-full" />
+              <input name="username" type="text" placeholder="Username" className="border border-white p-2 rounded-lg w-full text-white" />
+              <input name="password" type="password" placeholder="Password" className="border border-white p-2 rounded-lg w-full text-white" />
               <a href="/register" className="text-white underline">Sign Up</a>
               <button type="submit" className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-3 rounded-lg w-full">Login</button>
             </div>
@@ -52,4 +52,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

@@ -4,15 +4,17 @@ import { cookies } from 'next/headers'
 
 export async function GET(
     request: Request,
-    { params }: RouteContext<'/api/users/[username]'>
+    { params }: RouteContext<'/api/users/[username]/following'>
     ) {
     try {
         const { username } = await params;
         const cookieStore = await cookies();
         const sessionCookie = cookieStore.get("session");
+
         if (!sessionCookie) return NextResponse.json(
             { error: "Not authenticated" }, 
             { status: 401 });
+
         const sessionId = sessionCookie.value;
 
         const db = getDb();
@@ -34,38 +36,8 @@ export async function GET(
                 { status: 404 }
             );
         }
-        
-        const likesCounts = db.prepare("SELECT postId, COUNT(*) as count FROM likes GROUP BY postId").all();
-        const commentsCounts = db.prepare("SELECT postId, COUNT(*) as count FROM comments GROUP BY postId").all();
-        const likedByUser = db.prepare("SELECT postId FROM likes WHERE userId = ?").all(session.userId);
 
-        const likesMap: Record<number, number> = {};
-        const commentsMap: Record<number, number> = {};
-        const likedByUserMap: Record<number, boolean> = {};
-
-        for (const like of likesCounts) {
-            likesMap[like.postId] = like.count;
-        }
-
-        for (const comment of commentsCounts) {
-            commentsMap[comment.postId] = comment.count;
-        }
-
-        for (const post of likedByUser) {
-            likedByUserMap[post.postId] = true;
-        }
-
-        const posts = db.prepare("SELECT * FROM posts WHERE userId = ? ORDER BY createdAt DESC").all(user.id);
-
-        for (const post of posts) {
-            post.likeCount = likesMap[post.id] || 0;
-            post.commentCount = commentsMap[post.id] || 0;
-            post.likedByUser = likedByUserMap[post.id] == true;
-
-            post.comments = db
-                .prepare("SELECT * FROM comments WHERE postId = ? ORDER BY createdAt ASC")
-                .all(post.id);
-        }
+        const followingUsers = db.prepare("SELECT * FROM users WHERE username IN (SELECT followingId FROM followers WHERE followerId = ?)").all(user.username);
 
         const currentUser = db.prepare("SELECT username FROM users WHERE id = ?").get(session.userId);
 
@@ -78,7 +50,7 @@ export async function GET(
         user.followedByUser = followedByUser != null;
 
         return NextResponse.json(
-            { posts, user, session: { username: currentUser.username } },
+            { followingUsers, user, session: { username: currentUser.username } },
             { status: 200 }
         );
 

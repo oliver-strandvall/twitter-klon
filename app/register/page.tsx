@@ -43,9 +43,9 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-4 justify-center items-center">
               <h1 className="text-white text-2xl">Register</h1>
-              <input name="name" type="text" placeholder="Name" className="border border-white p-2 rounded-lg w-full" />
-              <input name="username" type="text" placeholder="Username" className="border border-white p-2 rounded-lg w-full" />
-              <input name="password" type="password" placeholder="Password" className="border border-white p-2 rounded-lg w-full" />
+              <input name="name" type="text" placeholder="Name" className="border border-white p-2 rounded-lg w-full text-white" />
+              <input name="username" type="text" placeholder="Username" className="border border-white p-2 rounded-lg w-full text-white" />
+              <input name="password" type="password" placeholder="Password" className="border border-white p-2 rounded-lg w-full text-white" />
               <a href="/login" className="text-white underline">Login</a>
               <button type="submit" className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-3 rounded-lg w-full">Register</button>
             </div>
@@ -55,4 +55,3 @@ export default function RegisterPage() {
     </div>
   )
 }
-
