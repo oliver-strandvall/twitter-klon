@@ -131,9 +131,9 @@ export default function UserPage({ params }: PageProps) {
           <div className="flex flex-row gap-5 items-center bg-gray-900 p-5 rounded-lg">
           {username !== session?.username ? (
            !user?.followedByUser ? (
-            <button onClick={handleFollow} className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-3 rounded-lg w-25">Follow</button>
+            <button onClick={handleFollow} className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-3 rounded-lg w-25 cursor-pointer">Follow</button>
           ) : (
-            <button onClick={handleUnfollow} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-3 rounded-lg w-25">Unfollow</button>
+            <button onClick={handleUnfollow} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-3 rounded-lg w-25 cursor-pointer">Unfollow</button>
           )
           ) : (
             <></>
@@ -153,16 +153,16 @@ export default function UserPage({ params }: PageProps) {
               </div>
               <div className="flex flex-row gap-2 items-center">
                 {!post.likedByUser ? (
-                  <button onClick={() => likePost(post.id)} className="bg-gray-900 hover:bg-gray-800 active:bg-gray-700 text-white p-2 rounded-lg w-10 h-10"><AiOutlineLike size={25} /></button>
+                  <button onClick={() => likePost(post.id)} className="bg-gray-900 hover:bg-gray-800 active:bg-gray-700 text-white p-2 rounded-lg w-10 h-10 cursor-pointer"><AiOutlineLike size={25} /></button>
                 ) : (
-                  <button onClick={() => unlikePost(post.id)} className="bg-gray-900 hover:bg-gray-800 active:bg-gray-700 text-white p-2 rounded-lg w-10 h-10"><AiFillLike size={25} /></button>
+                  <button onClick={() => unlikePost(post.id)} className="bg-gray-900 hover:bg-gray-800 active:bg-gray-700 text-white p-2 rounded-lg w-10 h-10 cursor-pointer"><AiFillLike size={25} /></button>
                 )}
                 <p className="mt-1.5">{post.likeCount}</p>
                 {showComments[post.id] && (
-                  <button onClick={() => setshowComments(prev => ({ ...prev, [post.id]: false }))} className="bg-gray-900 hover:bg-gray-800 active:bg-gray-700 text-white p-2 rounded-lg w-10 h-10 ml-2"><AiFillMessage size={25} /></button>
+                  <button onClick={() => setshowComments(prev => ({ ...prev, [post.id]: false }))} className="bg-gray-900 hover:bg-gray-800 active:bg-gray-700 text-white p-2 rounded-lg w-10 h-10 ml-2 cursor-pointer"><AiFillMessage size={25} /></button>
                 )}
                 {!showComments[post.id] && (
-                  <button onClick={() => setshowComments(prev => ({ ...prev, [post.id]: true }))} className="bg-gray-900 hover:bg-gray-800 active:bg-gray-700 text-white p-2 rounded-lg w-10 h-10 ml-2"><AiOutlineMessage size={25} /></button>
+                  <button onClick={() => setshowComments(prev => ({ ...prev, [post.id]: true }))} className="bg-gray-900 hover:bg-gray-800 active:bg-gray-700 text-white p-2 rounded-lg w-10 h-10 ml-2 cursor-pointer"><AiOutlineMessage size={25} /></button>
                 )}
                 <p className="mt-1.5">{post.commentCount}</p>
               </div>
@@ -170,7 +170,7 @@ export default function UserPage({ params }: PageProps) {
             <div className="flex justify-between gap-5 items-center">
               <p>{timeAgo(post.createdAt)}</p>
               {session?.id === post.userId && (
-                <button onClick={() => handleDelete(post.id)} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-2 rounded-lg w-20 h-12">Delete</button>
+                <button onClick={() => handleDelete(post.id)} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-2 rounded-lg w-20 h-12 cursor-pointer">Delete</button>
               )}
             </div>
             </div>
@@ -186,7 +186,7 @@ export default function UserPage({ params }: PageProps) {
                 <div className="flex justify-between gap-5 items-center">
                 <p>{timeAgo(comment.createdAt)}</p>
                   {session?.id === comment.userId && (
-                    <button onClick={() => handleDeleteComment(comment.id)} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-2 rounded-lg w-20 h-12">Delete</button>
+                    <button onClick={() => handleDeleteComment(comment.id)} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-2 rounded-lg w-20 h-12 cursor-pointer">Delete</button>
                   )}
                 </div>
               </div>

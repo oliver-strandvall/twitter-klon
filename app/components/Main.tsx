@@ -135,7 +135,10 @@ async function getFeed() {
         <Post key={post.id} post={post} session={session} showComments={showComments} setshowComments={setshowComments} likePost={likePost} unlikePost={unlikePost} handleDelete={handleDelete} handleCommentSubmit={handleCommentSubmit} handleDeleteComment={handleDeleteComment} />
       ))}
       <div onClick={() => setShowAllPosts(!showAllPosts)} className="bg-gray-950 p-5 rounded-lg w-full cursor-pointer">
-        <h1>All Posts:</h1>
+        <div className="w-full flex justify-between items-center">
+          <h1>All Posts:</h1>
+          {!showAllPosts ? <p>▼</p> : <p>▲</p>}
+        </div>
       </div>
       {showAllPosts && data.map((post) => (
         <Post key={post.id} post={post} session={session} showComments={showComments} setshowComments={setshowComments} likePost={likePost} unlikePost={unlikePost} handleDelete={handleDelete} handleCommentSubmit={handleCommentSubmit} handleDeleteComment={handleDeleteComment} />
@@ -145,13 +148,13 @@ async function getFeed() {
         <h1>Create Post:</h1>
         <form onSubmit={handleSubmit} className="w-full flex justify-between items-center">
           <input value={message} onChange={(e) => setMessage(e.target.value)} name="post" type="text" placeholder="What's on your mind..." className="bg-gray-900 w-1/2 p-5 rounded-lg h-15"></input>
-          <button type="submit" className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-3 rounded-lg w-35 h-15">Post</button>
+          <button type="submit" className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-3 rounded-lg w-35 h-15 cursor-pointer">Post</button>
         </form>
       </div>
       <div className="items-center flex justify-between bg-gray-950 w-full m-5 p-5 rounded-lg">
-        <button onClick={handleProfile} className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-3 rounded-lg w-25">Profile</button>
+        <button onClick={handleProfile} className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-3 rounded-lg w-25 cursor-pointer">Profile</button>
         <p>Logged In As: {session.username}</p>
-        <button onClick={handleLogout} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-3 rounded-lg w-25">Logout</button>
+        <button onClick={handleLogout} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-3 rounded-lg w-25 cursor-pointer">Logout</button>
       </div>
     </div>
   );
