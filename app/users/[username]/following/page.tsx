@@ -60,6 +60,7 @@ export default function UserPage({ params }: PageProps) {
           </div>
           <div className="w-full flex justify-between items-center bg-gray-900 p-5 rounded-lg">
             <div className="w-full flex flex-row gap-5 items-center">
+              <a href="/" className="underline">Home</a>
               <h1><a href={`/users/${username}/followers`} className="underline">Followers: {user?.followerCount}</a></h1>
               <h1><a href={`/users/${username}/following`} className="underline">Following: {user?.followingCount}</a></h1>
               </div>

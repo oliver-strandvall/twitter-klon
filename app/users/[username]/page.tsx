@@ -3,19 +3,23 @@
 import { AiOutlineLike, AiFillLike } from "react-icons/ai"
 import { AiOutlineMessage, AiFillMessage } from "react-icons/ai";
 import { use, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import CommentForm from "../../components/commentForm";
+import PostForm from "../../components/PostForm";
 
 type PageProps = {
   params: Promise<{ username: string }>;
 }
 
 export default function UserPage({ params }: PageProps) {
+  const router = useRouter();
   const [data, setData] = useState<{ id: number; content: string; userId: number; createdAt: number; userName: string, name: string, likeCount: number, likedByUser: boolean, commentCount: number,
   comments: { id: number; content: string; userId: number; createdAt: number; username: string }[] }[] | []>([]);
   const [user, setUser] = useState<{ id: number; username: string; name: string; followedByUser: boolean; followerCount: number, followingCount: number } | null>(null);
   const [session, setSession] = useState<{ username: string; name: string; id: number } | null>(null);
   const [update, setUpdate] = useState(false);
   const [showComments, setshowComments] = useState<{ [key: number]: boolean }>({});
+  const [message, setMessage] = useState("");
   const username = use(params).username;
 
   function timeAgo(timestamp: number) {
@@ -116,6 +120,24 @@ export default function UserPage({ params }: PageProps) {
     }
   }
 
+    async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    const content = (data.get("post") || "").toString().trim();
+
+    const res = await fetch("/api/posts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content }),
+    });
+    if (res.ok) {
+      setMessage("");
+      setUpdate(prev => !prev);
+    }
+  }
+
   useEffect(() => {
     load();
   }, [update]);
@@ -138,6 +160,7 @@ export default function UserPage({ params }: PageProps) {
           ) : (
             <></>
           )}
+          <a href="/" className="underline">Home</a>
           <h1><a href={`/users/${username}/followers`} className="underline">Followers: {user?.followerCount}</a></h1>
           <h1><a href={`/users/${username}/following`} className="underline">Following: {user?.followingCount}</a></h1>
           </div>
@@ -196,6 +219,9 @@ export default function UserPage({ params }: PageProps) {
           </div>
         ))}
       </div>
-      </div>
+      {user?.username === session?.username && (
+        <PostForm  handleSubmit={handleSubmit} message={message} setMessage={setMessage} />
+      )}
+    </div>
   )
 }

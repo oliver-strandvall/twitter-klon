@@ -78,7 +78,7 @@ export async function GET(
         user.followedByUser = followedByUser != null;
 
         return NextResponse.json(
-            { posts, user, session: { username: currentUser.username } },
+            { posts, user, session: { id: session.userId, username: currentUser.username, name: session.name } },
             { status: 200 }
         );
 

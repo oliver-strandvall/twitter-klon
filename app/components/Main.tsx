@@ -4,6 +4,7 @@ import { use, useEffect, useState } from "react"
 import { useRouter } from "next/navigation";
 import CommentForm from "./commentForm";
 import Post from "./Post";
+import PostForm from "./PostForm";
 
 type PageProps = {
   session: { username: string; name: string; id: number };
@@ -18,6 +19,7 @@ export default function Main({ session }: PageProps) {
   const [showComments, setshowComments] = useState<{ [key: number]: boolean }>({});
   const [feed, setFeed] = useState<typeof data>([]); 
   const [showAllPosts, setShowAllPosts] = useState(false);
+  const [showForYou, setShowForYou] = useState(true);
 
   async function handleLogout() {
     await fetch("/api/logout", {
@@ -86,19 +88,11 @@ export default function Main({ session }: PageProps) {
     }
   }
 
-async function getFeed() {
-  const res = await fetch("/api/feed");
-  if (res.ok) {
-    const json = await res.json();
-    setFeed(json.feed);
-  }
-}
-
-  async function getComments(id: number) {
-    const res = await fetch(`/api/posts/${id}/comments`);
+  async function getFeed() {
+    const res = await fetch("/api/feed");
     if (res.ok) {
       const json = await res.json();
-      return json.comments;
+      setFeed(json.feed);
     }
   }
 
@@ -127,14 +121,22 @@ async function getFeed() {
 
   return (
     <div className="flex flex-col min-h-screen items-center bg-gray-800 text-white p-5">
-      <div className="w-full m-5 flex flex-col gap-5 rounded-lg">
-      <div className="bg-gray-950 p-5 rounded-lg w-full">
-        <h1>For You:</h1>
+      <div className="w-full flex flex-col gap-5 rounded-lg">
+      <div onClick={() => setShowForYou(!showForYou)} className="bg-gray-950 p-5 rounded-lg w-full cursor-pointer">
+        <div className="w-full flex justify-between items-center">
+          <h1>For You:</h1>
+          {!showForYou ? <p>▼</p> : <p>▲</p>}
+        </div>
       </div>
-      {feed.map((post) => (
+      {showForYou && feed.map((post) => (
         <Post key={post.id} post={post} session={session} showComments={showComments} setshowComments={setshowComments} likePost={likePost} unlikePost={unlikePost} handleDelete={handleDelete} handleCommentSubmit={handleCommentSubmit} handleDeleteComment={handleDeleteComment} />
       ))}
-      <div onClick={() => setShowAllPosts(!showAllPosts)} className="bg-gray-950 p-5 rounded-lg w-full cursor-pointer">
+      {feed.length === 0 && (
+        <div className="p-5 rounded-lg w-full text-center">
+          <h1>No posts to show. Follow some users to see their posts here!</h1>
+        </div>
+      )}
+      <div onClick={() => setShowAllPosts(!showAllPosts)} className="bg-gray-950 p-5 rounded-lg w-full cursor-pointer mt-5">
         <div className="w-full flex justify-between items-center">
           <h1>All Posts:</h1>
           {!showAllPosts ? <p>▼</p> : <p>▲</p>}
@@ -143,18 +145,12 @@ async function getFeed() {
       {showAllPosts && data.map((post) => (
         <Post key={post.id} post={post} session={session} showComments={showComments} setshowComments={setshowComments} likePost={likePost} unlikePost={unlikePost} handleDelete={handleDelete} handleCommentSubmit={handleCommentSubmit} handleDeleteComment={handleDeleteComment} />
       ))}
+      <PostForm handleSubmit={handleSubmit} message={message} setMessage={setMessage} />
+      <div className="items-center flex justify-between bg-gray-950 w-full p-5 rounded-lg">
+          <button onClick={handleProfile} className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-3 rounded-lg w-25 cursor-pointer">Profile</button>
+          <p>Logged In As: {session.username}</p>
+          <button onClick={handleLogout} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-3 rounded-lg w-25 cursor-pointer">Logout</button>
       </div>
-      <div className="bg-gray-950 w-full m-5 p-5 flex flex-col gap-5 rounded-lg">
-        <h1>Create Post:</h1>
-        <form onSubmit={handleSubmit} className="w-full flex justify-between items-center">
-          <input value={message} onChange={(e) => setMessage(e.target.value)} name="post" type="text" placeholder="What's on your mind..." className="bg-gray-900 w-1/2 p-5 rounded-lg h-15"></input>
-          <button type="submit" className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-3 rounded-lg w-35 h-15 cursor-pointer">Post</button>
-        </form>
-      </div>
-      <div className="items-center flex justify-between bg-gray-950 w-full m-5 p-5 rounded-lg">
-        <button onClick={handleProfile} className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-3 rounded-lg w-25 cursor-pointer">Profile</button>
-        <p>Logged In As: {session.username}</p>
-        <button onClick={handleLogout} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-3 rounded-lg w-25 cursor-pointer">Logout</button>
       </div>
     </div>
   );

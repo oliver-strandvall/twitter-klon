@@ -24,7 +24,7 @@ export default function UserPage({ params }: PageProps) {
     setSession(json.session);
   }
 
-  async function handleFollow() {
+  async function handleFollow(userToFollow: string) {
     const res = await fetch(`/api/users/${username}/follow`, {
       method: "POST",
     });
@@ -33,7 +33,7 @@ export default function UserPage({ params }: PageProps) {
     }
   }
 
-  async function handleUnfollow() {
+  async function handleUnfollow(userToUnfollow: string) {
     const res = await fetch(`/api/users/${username}/follow`, {
       method: "DELETE",
     });
@@ -60,6 +60,7 @@ export default function UserPage({ params }: PageProps) {
           </div>
           <div className="w-full flex justify-between items-center bg-gray-900 p-5 rounded-lg">
             <div className="w-full flex flex-row gap-5 items-center">
+              <a href="/" className="underline">Home</a>
               <h1><a href={`/users/${username}/followers`} className="underline">Followers: {user?.followerCount}</a></h1>
               <h1><a href={`/users/${username}/following`} className="underline">Following: {user?.followingCount}</a></h1>
               </div>
@@ -77,12 +78,12 @@ export default function UserPage({ params }: PageProps) {
               <div>
                   <h1><a href={`/users/${user.username}`} className="underline">{user.username}</a></h1>
                   <p className="text-gray-500 text-sm">@{user.name}</p>
-                  {/* {username !== session?.username ? (
-                  !user?.followedByUser ? (
-                      <button onClick={handleFollow} className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-3 rounded-lg w-25">Follow</button>
-                  ) : (
-                      <button onClick={handleUnfollow} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-3 rounded-lg w-25">Unfollow</button>
-                  )
+                  {/* {user.username != session?.username ? (
+                      !user?.followedByUser ? (
+                          <button onClick={() => handleFollow(user.username)} className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-3 rounded-lg w-25">Follow</button>
+                      ) : (
+                          <button onClick={() => handleUnfollow(user.username)} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-3 rounded-lg w-25">Unfollow</button>
+                      )
                   ) : (
                       <></>
                   )} */}
