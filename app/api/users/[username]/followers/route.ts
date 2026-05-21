@@ -49,6 +49,7 @@ export async function GET(
         user.followingCount = followingCount?.count || 0;
         user.followedByUser = followedByUser != null;
 
+        console.log(user);
         return NextResponse.json(
             { followers, user, session: { username: currentUser.username } },
             { status: 200 }

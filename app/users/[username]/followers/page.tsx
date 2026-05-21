@@ -10,7 +10,7 @@ type PageProps = {
 export default function UserPage({ params }: PageProps) {
   const router = useRouter();
   const [user, setUser] = useState<{ id: number; username: string; name: string; followedByUser: boolean; followerCount: number, followingCount: number } | null>(null);
-  const [followingUsers, setFollowingUsers] = useState<{ id: number; username: string; name: string }[] | []>([]);
+  const [followers, setFollowers] = useState<{ id: number; username: string; name: string }[] | []>([]);
   const [session, setSession] = useState<{ username: string; name: string; id: number } | null>(null);
   const [update, setUpdate] = useState(false);
   const username = use(params).username;
@@ -20,26 +20,8 @@ export default function UserPage({ params }: PageProps) {
     if (!res.ok) return;
     const json = await res.json();
     setUser(json.user);
-    setFollowingUsers(json.followers);
+    setFollowers(json.followers);
     setSession(json.session);
-  }
-
-  async function handleFollow(userToFollow: string) {
-    const res = await fetch(`/api/users/${username}/follow`, {
-      method: "POST",
-    });
-    if (res.ok) {
-      setUpdate(prev => !prev);
-    }
-  }
-
-  async function handleUnfollow(userToUnfollow: string) {
-    const res = await fetch(`/api/users/${username}/follow`, {
-      method: "DELETE",
-    });
-    if (res.ok) {
-      setUpdate(prev => !prev);
-    }
   }
 
   async function handleProfile() {
@@ -71,22 +53,13 @@ export default function UserPage({ params }: PageProps) {
         </div>
       </div>
       <div className="w-full m-5 flex flex-col gap-5 rounded-lg">
-      {followingUsers.map((user) => (
+      {followers.map((user) => (
           <div key={user.id} className="bg-gray-900 p-5 rounded-lg">
           <div className="flex justify-between items-center">
           <div className="flex flex-col flex-wrap gap-2">
               <div>
                   <h1><a href={`/users/${user.username}`} className="underline">{user.username}</a></h1>
                   <p className="text-gray-500 text-sm">@{user.name}</p>
-                  {/* {user.username != session?.username ? (
-                      !user?.followedByUser ? (
-                          <button onClick={() => handleFollow(user.username)} className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-3 rounded-lg w-25">Follow</button>
-                      ) : (
-                          <button onClick={() => handleUnfollow(user.username)} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-3 rounded-lg w-25">Unfollow</button>
-                      )
-                  ) : (
-                      <></>
-                  )} */}
               </div>
           </div>
           </div>

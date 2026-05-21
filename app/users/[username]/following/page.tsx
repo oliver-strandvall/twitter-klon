@@ -24,24 +24,6 @@ export default function UserPage({ params }: PageProps) {
     setSession(json.session);
   }
 
-  async function handleFollow() {
-    const res = await fetch(`/api/users/${username}/follow`, {
-      method: "POST",
-    });
-    if (res.ok) {
-      setUpdate(prev => !prev);
-    }
-  }
-
-  async function handleUnfollow() {
-    const res = await fetch(`/api/users/${username}/follow`, {
-      method: "DELETE",
-    });
-    if (res.ok) {
-      setUpdate(prev => !prev);
-    }
-  }
-
   async function handleProfile() {
     router.push(`/users/${username}`);
   }
@@ -78,15 +60,6 @@ export default function UserPage({ params }: PageProps) {
                 <div>
                     <h1><a href={`/users/${user.username}`} className="underline">{user.username}</a></h1>
                     <p className="text-gray-500 text-sm">@{user.name}</p>
-                    {/* {username !== session?.username ? (
-                    !user?.followedByUser ? (
-                        <button onClick={handleFollow} className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-3 rounded-lg w-25">Follow</button>
-                    ) : (
-                        <button onClick={handleUnfollow} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-3 rounded-lg w-25">Unfollow</button>
-                    )
-                    ) : (
-                        <></>
-                    )} */}
                 </div>
             </div>
             </div>
