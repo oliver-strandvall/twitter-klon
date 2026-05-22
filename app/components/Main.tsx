@@ -148,7 +148,7 @@ export default function Main({ session }: PageProps) {
       <PostForm handleSubmit={handleSubmit} message={message} setMessage={setMessage} />
       <div className="items-center flex justify-between bg-gray-950 w-full p-5 rounded-lg">
           <button onClick={handleProfile} className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-3 rounded-lg w-25 cursor-pointer">Profile</button>
-          <p>Logged In As: {session.username}</p>
+          <p>{session.username}</p>
           <button onClick={handleLogout} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-3 rounded-lg w-25 cursor-pointer">Logout</button>
       </div>
       </div>

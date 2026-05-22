@@ -2,6 +2,8 @@
 
 import { AiOutlineLike, AiFillLike } from "react-icons/ai"
 import { AiOutlineMessage, AiFillMessage } from "react-icons/ai";
+import { FaTrash } from "react-icons/fa";
+import { HiHome } from "react-icons/hi";
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import CommentForm from "../../components/commentForm";
@@ -147,7 +149,10 @@ export default function UserPage({ params }: PageProps) {
       <div className="bg-gray-950 p-5 rounded-lg w-full flex flex-row justify-between items-center">
         <div className="flex flex-col gap-2 w-full">
           <div className="flex flex-row justify-between w-full">
-            <h1>{username}</h1>
+            <div className="flex flex-row gap-2 items-center">
+              <button onClick={() => router.push("/")} className="bg-gray-950 hover:bg-gray-800 active:bg-gray-700 text-white p-2 rounded-lg w-10 h-10 cursor-pointer"><HiHome size={25} /></button>
+              <h1 className="text-xl font-bold mt-1.5">{username}</h1>
+            </div>
             <p className="text-gray-500 text-sm">@{user?.name }</p>
           </div>
           <div className="flex flex-row gap-5 items-center bg-gray-900 p-5 rounded-lg">
@@ -160,7 +165,6 @@ export default function UserPage({ params }: PageProps) {
           ) : (
             <></>
           )}
-          <a href="/" className="underline">Home</a>
           <h1><a href={`/users/${username}/followers`} className="underline">Followers: {user?.followerCount}</a></h1>
           <h1><a href={`/users/${username}/following`} className="underline">Following: {user?.followingCount}</a></h1>
           </div>
@@ -193,7 +197,7 @@ export default function UserPage({ params }: PageProps) {
             <div className="flex justify-between gap-5 items-center">
               <p>{timeAgo(post.createdAt)}</p>
               {session?.id === post.userId && (
-                <button onClick={() => handleDelete(post.id)} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-2 rounded-lg w-20 h-12 cursor-pointer">Delete</button>
+                <button onClick={() => handleDelete(post.id)} className="bg-gray-900 hover:bg-red-800 active:bg-red-700 text-white p-2 rounded-lg w-10 h-10 cursor-pointer"><FaTrash size={25} /></button>
               )}
             </div>
             </div>
@@ -209,7 +213,7 @@ export default function UserPage({ params }: PageProps) {
                 <div className="flex justify-between gap-5 items-center">
                 <p>{timeAgo(comment.createdAt)}</p>
                   {session?.id === comment.userId && (
-                    <button onClick={() => handleDeleteComment(comment.id)} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-2 rounded-lg w-20 h-12 cursor-pointer">Delete</button>
+                    <button onClick={() => handleDeleteComment(comment.id)} className="bg-gray-950 hover:bg-red-800 active:bg-red-700 text-white p-2 rounded-lg w-10 h-10 cursor-pointer"><FaTrash size={25} /></button>
                   )}
                 </div>
               </div>

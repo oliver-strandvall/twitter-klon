@@ -2,6 +2,7 @@ import React from 'react'
 import CommentForm from './commentForm'
 import { AiOutlineLike, AiFillLike } from "react-icons/ai"
 import { AiOutlineMessage, AiFillMessage } from "react-icons/ai";
+import { FaTrash } from "react-icons/fa";
 
 type PostProps = {
     post: any,
@@ -81,7 +82,7 @@ export default function Post({
             <div className="flex justify-between gap-5 items-center">
                 <p>{timeAgo(post.createdAt)}</p>
                 {session.id === post.userId && (
-                    <button onClick={() => handleDelete(post.id)} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-2 rounded-lg w-20 h-12 cursor-pointer">Delete</button>
+                    <button onClick={() => handleDelete(post.id)} className="bg-gray-900 hover:bg-red-800 active:bg-red-700 text-white p-2 rounded-lg w-10 h-10 cursor-pointer"><FaTrash size={25} /></button>
                 )}
             </div>
         </div>
@@ -97,7 +98,7 @@ export default function Post({
             <div className="flex justify-between gap-5 items-center">
             <p>{timeAgo(comment.createdAt)}</p>
             {session.id === comment.userId && (
-                <button onClick={() => handleDeleteComment(comment.id)} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-2 rounded-lg w-20 h-12 cursor-pointer">Delete</button>
+                <button onClick={() => handleDeleteComment(comment.id)} className="bg-gray-950 hover:bg-red-800 active:bg-red-700 text-white p-2 rounded-lg w-10 h-10 cursor-pointer"><FaTrash size={25} /></button>
             )}
             </div>
         </div>
