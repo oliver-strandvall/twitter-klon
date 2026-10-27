@@ -2,8 +2,9 @@
 
 import { AiOutlineLike, AiFillLike } from "react-icons/ai"
 import { AiOutlineMessage, AiFillMessage } from "react-icons/ai";
-import { FaTrash } from "react-icons/fa";
-import { HiHome } from "react-icons/hi";
+import { FiUserPlus, FiUserMinus } from "react-icons/fi";
+import { FiHome } from "react-icons/fi";
+import { FiTrash2 } from "react-icons/fi";
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import CommentForm from "../../components/commentForm";
@@ -150,7 +151,7 @@ export default function UserPage({ params }: PageProps) {
         <div className="flex flex-col gap-2 w-full">
           <div className="flex flex-row justify-between w-full">
             <div className="flex flex-row gap-2 items-center">
-              <button onClick={() => router.push("/")} className="bg-gray-950 hover:bg-gray-800 active:bg-gray-700 text-white p-2 rounded-lg w-10 h-10 cursor-pointer"><HiHome size={25} /></button>
+              <button onClick={() => router.push("/")} className="bg-gray-950 hover:bg-gray-800 active:bg-gray-700 text-white p-2 rounded-lg w-10 h-10 cursor-pointer"><FiHome size={25} /></button>
               <h1 className="text-xl font-bold mt-1.5">{username}</h1>
             </div>
             <p className="text-gray-500 text-sm">@{user?.name }</p>
@@ -158,9 +159,9 @@ export default function UserPage({ params }: PageProps) {
           <div className="flex flex-row gap-5 items-center bg-gray-900 p-5 rounded-lg">
           {username !== session?.username ? (
            !user?.followedByUser ? (
-            <button onClick={handleFollow} className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-3 rounded-lg w-25 cursor-pointer">Follow</button>
+            <button onClick={handleFollow} className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-2 rounded-lg w-10 h-10 cursor-pointer"><FiUserPlus size={25} /></button>
           ) : (
-            <button onClick={handleUnfollow} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-3 rounded-lg w-25 cursor-pointer">Unfollow</button>
+            <button onClick={handleUnfollow} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-2 rounded-lg w-10 h-10 cursor-pointer"><FiUserMinus size={25} /></button>
           )
           ) : (
             <></>
@@ -194,29 +195,36 @@ export default function UserPage({ params }: PageProps) {
                 <p className="mt-1.5">{post.commentCount}</p>
               </div>
             </div>
-            <div className="flex justify-between gap-5 items-center">
+            <div className="flex justify-between gap-3 items-center">
               <p>{timeAgo(post.createdAt)}</p>
               {session?.id === post.userId && (
-                <button onClick={() => handleDelete(post.id)} className="bg-gray-900 hover:bg-red-800 active:bg-red-700 text-white p-2 rounded-lg w-10 h-10 cursor-pointer"><FaTrash size={25} /></button>
+                <button onClick={() => handleDelete(post.id)} className="bg-gray-900 hover:bg-red-800 active:bg-red-700 text-white p-1 rounded-lg w-8 h-8 cursor-pointer"><FiTrash2 size={22} /></button>
               )}
             </div>
             </div>
             {showComments[post.id] && (
             <>
             <CommentForm postId={post.id} onCommentSubmit={handleCommentSubmit} />
-            {post.comments?.map((comment) => (
-              <div key={comment.id} className="bg-gray-950 p-5 rounded-lg mt-5 flex justify-between items-center">
-                <div className="flex justify-between gap-5 items-center">
-                  <p><a href={`/users/${comment.username}`} className="underline">{comment.username}</a></p>
-                  <p>{comment.content}</p>
+            {post.comments?.map((comment: any) => (
+                <div key={comment.id} className="bg-gray-950 p-5 rounded-lg mt-5 flex justify-center items-center">
+                    <div className="w-full">
+                        <div className="flex justify-between items-center gap-3">
+                            <a href={`/users/${comment.username}`} className="underline">
+                            {comment.username}
+                            </a>
+                            <div className="flex items-center gap-3">
+                                <p>{timeAgo(comment.createdAt)}</p>
+                                {session?.id === comment.userId && (
+                                    <button onClick={() => handleDeleteComment(comment.id)}
+                                    className="bg-gray-950 hover:bg-red-800 active:bg-red-700 text-white p-1 rounded-lg w-8 h-8 cursor-pointer text-center">
+                                    <FiTrash2 size={22} />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                        <p className="mt-2">{comment.content}</p>
+                    </div>
                 </div>
-                <div className="flex justify-between gap-5 items-center">
-                <p>{timeAgo(comment.createdAt)}</p>
-                  {session?.id === comment.userId && (
-                    <button onClick={() => handleDeleteComment(comment.id)} className="bg-gray-950 hover:bg-red-800 active:bg-red-700 text-white p-2 rounded-lg w-10 h-10 cursor-pointer"><FaTrash size={25} /></button>
-                  )}
-                </div>
-              </div>
             ))}
             </>
             )}

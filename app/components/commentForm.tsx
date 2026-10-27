@@ -1,5 +1,6 @@
 "use client"
 
+import { FiSend } from "react-icons/fi";
 import { useState, type FormEvent } from "react";
 
 type CommentFormProps = {
@@ -22,8 +23,8 @@ export default function CommentForm({ postId, onCommentSubmit }: CommentFormProp
 
   return (
     <form onSubmit={handleSubmit} className="w-full flex justify-between items-center mt-5">
-      <input value={comment} onChange={(e) => setComment(e.target.value)} name="comment" type="text" placeholder="Add a comment..." className="bg-gray-950 w-1/2 p-5 rounded-lg h-15"/>
-      <button type="submit" className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-3 rounded-lg w-35 h-15 cursor-pointer">Post</button>
+      <input value={comment} onChange={(e) => setComment(e.target.value)} name="comment" type="text" placeholder="Add a comment..." className="bg-gray-950 w-2/3 p-5 rounded-lg h-15"/>
+      <button type="submit" className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-3 rounded-lg w-15 h-15 cursor-pointer"><FiSend size={30} /></button>
     </form>
   );
 }

@@ -7,9 +7,16 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { username, name, password } = body || {};
 
-    if (!username || !name || !password) {
+    if (username.length < 2 || name.length < 2 || password.length < 2) {
       return NextResponse.json(
-        { error: "name, username and password are required" },
+        { error: "Content missing or too short" },
+        { status: 400 }
+      );
+    }
+
+    if(username.length > 15 || name.length > 15) {
+      return NextResponse.json(
+        { error: "Content too long" },
         { status: 400 }
       );
     }

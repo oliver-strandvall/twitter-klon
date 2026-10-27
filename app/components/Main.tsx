@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import CommentForm from "./commentForm";
 import Post from "./Post";
 import PostForm from "./PostForm";
+import { FiLogOut, FiUser } from "react-icons/fi";
 
 type PageProps = {
   session: { username: string; name: string; id: number };
@@ -147,9 +148,9 @@ export default function Main({ session }: PageProps) {
       ))}
       <PostForm handleSubmit={handleSubmit} message={message} setMessage={setMessage} />
       <div className="items-center flex justify-between bg-gray-950 w-full p-5 rounded-lg">
-          <button onClick={handleProfile} className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-3 rounded-lg w-25 cursor-pointer">Profile</button>
+          <button onClick={handleProfile} className="bg-blue-800 hover:bg-blue-700 active:bg-blue-600 text-white p-2 rounded-lg w-10 h-10 cursor-pointer"><FiUser size={25} /></button>
           <p>{session.username}</p>
-          <button onClick={handleLogout} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-3 rounded-lg w-25 cursor-pointer">Logout</button>
+          <button onClick={handleLogout} className="bg-red-800 hover:bg-red-700 active:bg-red-600 text-white p-2 rounded-lg w-10 h-10 cursor-pointer"><FiLogOut size={25} /></button>
       </div>
       </div>
     </div>

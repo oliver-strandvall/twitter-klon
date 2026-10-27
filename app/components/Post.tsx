@@ -2,7 +2,7 @@ import React from 'react'
 import CommentForm from './commentForm'
 import { AiOutlineLike, AiFillLike } from "react-icons/ai"
 import { AiOutlineMessage, AiFillMessage } from "react-icons/ai";
-import { FaTrash } from "react-icons/fa";
+import { FiTrash2 } from "react-icons/fi";
 
 type PostProps = {
     post: any,
@@ -79,10 +79,10 @@ export default function Post({
                     <p className="mt-1.5">{post.commentCount}</p>
                 </div>
             </div>
-            <div className="flex justify-between gap-5 items-center">
+            <div className="flex justify-between gap-3 items-center">
                 <p>{timeAgo(post.createdAt)}</p>
                 {session.id === post.userId && (
-                    <button onClick={() => handleDelete(post.id)} className="bg-gray-900 hover:bg-red-800 active:bg-red-700 text-white p-2 rounded-lg w-10 h-10 cursor-pointer"><FaTrash size={25} /></button>
+                    <button onClick={() => handleDelete(post.id)} className="bg-gray-900 hover:bg-red-800 active:bg-red-700 text-white p-1 rounded-lg w-8 h-8 cursor-pointer"><FiTrash2 size={22} /></button>
                 )}
             </div>
         </div>
@@ -90,18 +90,25 @@ export default function Post({
         <>
         <CommentForm postId={post.id} onCommentSubmit={handleCommentSubmit} />
         {post.comments?.map((comment: any) => (
-        <div key={comment.id} className="bg-gray-950 p-5 rounded-lg mt-5 flex justify-between items-center">
-            <div className="flex justify-between gap-5 items-center">
-            <p><a href={`/users/${comment.username}`} className="underline">{comment.username}</a></p>
-            <p>{comment.content}</p>
+            <div key={comment.id} className="bg-gray-950 p-5 rounded-lg mt-5 flex justify-center items-center">
+                <div className="w-full">
+                    <div className="flex justify-between items-center gap-3">
+                        <a href={`/users/${comment.username}`} className="underline">
+                        {comment.username}
+                        </a>
+                        <div className="flex items-center gap-3">
+                            <p>{timeAgo(comment.createdAt)}</p>
+                            {session.id === comment.userId && (
+                                <button onClick={() => handleDeleteComment(comment.id)}
+                                className="bg-gray-950 hover:bg-red-800 active:bg-red-700 text-white p-1 rounded-lg w-8 h-8 cursor-pointer text-center">
+                                <FiTrash2 size={22} />
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                    <p className="mt-2">{comment.content}</p>
+                </div>
             </div>
-            <div className="flex justify-between gap-5 items-center">
-            <p>{timeAgo(comment.createdAt)}</p>
-            {session.id === comment.userId && (
-                <button onClick={() => handleDeleteComment(comment.id)} className="bg-gray-950 hover:bg-red-800 active:bg-red-700 text-white p-2 rounded-lg w-10 h-10 cursor-pointer"><FaTrash size={25} /></button>
-            )}
-            </div>
-        </div>
         ))}
         </>
         )}

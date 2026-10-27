@@ -10,7 +10,7 @@ export async function POST(request: Request,
     const sessionCookie = cookieStore.get("session");
     const { id } = await params;
 
-    if (!sessionCookie) {
+    if(!sessionCookie) {
       return NextResponse.json(
         { error: "Not authenticated" },
         { status: 401 }
@@ -25,6 +25,20 @@ export async function POST(request: Request,
 
     const db = getDb();
     const session = db.prepare("SELECT * FROM sessions WHERE sessionId = ?").get(sessionId);
+
+    if(!content) {
+      return NextResponse.json(
+        { error: "Content is required" },
+        { status: 400 }
+      );
+    }
+
+    if(content.length > 50) {
+      return NextResponse.json(
+        { error: "Content too long" },
+        { status: 400 }
+      );
+    }
 
     if(!session) {
       return NextResponse.json(
@@ -43,6 +57,7 @@ export async function POST(request: Request,
     }
 
     const user = db.prepare("SELECT * FROM users WHERE id = ?").get(session.userId);
+
     if(!user) {
       return NextResponse.json(
         { error: "Invalid user" },

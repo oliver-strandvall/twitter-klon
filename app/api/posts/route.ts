@@ -27,6 +27,13 @@ export async function POST(request: Request) {
       );
     }
 
+    if(content.length > 50) {
+      return NextResponse.json(
+        { error: "Content too long" },
+        { status: 400 }
+      );
+    }
+
     const db = getDb();
     const session = db.prepare("SELECT * FROM sessions WHERE sessionId = ?").get(sessionId);
 
